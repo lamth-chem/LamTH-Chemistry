@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#4038d8">
+  <title>LamTH Chemistry | Student Attendance</title>
+  <style>
+    :root { color-scheme: light; --primary:#4038d8; --primary-dark:#3028ae; --ink:#1f2440; --muted:#68708a; --line:#e4e7f0; --surface:#fff; --bg:#f5f6fc; --good:#16794b; --bad:#b42318; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; color:var(--ink); background:radial-gradient(circle at top right,#e8e7ff 0,transparent 34%),var(--bg); min-height:100vh; }
+    .wrap { width:min(100% - 32px,680px); margin:0 auto; padding:34px 0 42px; }
+    header { display:flex; align-items:center; gap:14px; margin-bottom:24px; }
+    .logo { width:54px;height:54px;border-radius:17px;display:grid;place-items:center;background:linear-gradient(145deg,#5c55ee,#3028ae);color:#fff;box-shadow:0 8px 20px #4038d82b;flex:none; }
+    .logo svg { width:30px;height:30px; }
+    h1 { font-size:clamp(1.45rem,4vw,2rem);line-height:1.1;margin:0 0 5px;letter-spacing:-.04em; }
+    .subtitle { color:var(--muted);font-size:.94rem;margin:0; }
+    .pill { display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border-radius:99px;background:#eeedff;color:var(--primary-dark);font-size:.8rem;font-weight:700;margin-bottom:15px; }
+    .dot { width:7px;height:7px;background:#675df1;border-radius:50%; }
+    .card { background:var(--surface);border:1px solid var(--line);border-radius:22px;box-shadow:0 16px 44px #2025520c;overflow:hidden; }
+    .card-head { padding:23px 24px 18px;border-bottom:1px solid var(--line); }
+    .card-head h2 { margin:0 0 7px;font-size:1.22rem;letter-spacing:-.025em; }
+    .card-head p { margin:0;color:var(--muted);font-size:.93rem;line-height:1.5; }
+    form { padding:23px 24px 25px; }
+    .grid { display:grid;grid-template-columns:1fr 1fr;gap:17px 15px; }
+    .field { display:flex;flex-direction:column;gap:7px;min-width:0; }
+    .full { grid-column:1/-1; }
+    label { font-weight:700;font-size:.88rem; }
+    input,select { width:100%;height:48px;border:1px solid #d6dbea;border-radius:11px;padding:0 13px;background:#fff;color:var(--ink);font:inherit;outline:none; }
+    input:focus,select:focus { border-color:var(--primary);box-shadow:0 0 0 3px #4038d81a; }
+    input::placeholder { color:#9aa0b4; }
+    .hint { font-size:.78rem;color:var(--muted);line-height:1.45; }
+    .status-options { display:grid;grid-template-columns:1fr 1fr;gap:12px; }
+    .status-option { position:relative; }
+    .status-option input { position:absolute;opacity:0;width:1px;height:1px; }
+    .status-option label { display:flex;align-items:center;justify-content:center;gap:9px;height:49px;border:1px solid #d6dbea;border-radius:12px;cursor:pointer;color:#555d75;transition:.15s; }
+    .status-option label:before { content:"";width:10px;height:10px;border:2px solid #a4abc0;border-radius:50%; }
+    .status-option input:checked + label { border-color:var(--primary);background:#f0efff;color:var(--primary-dark);box-shadow:inset 0 0 0 1px var(--primary); }
+    .status-option input:checked + label:before { border-color:var(--primary);background:var(--primary);box-shadow:inset 0 0 0 2px #f0efff; }
+    .status-option input:focus-visible + label { outline:3px solid #4038d84a;outline-offset:2px; }
+    .submit { width:100%;height:51px;margin-top:23px;border:0;border-radius:12px;background:var(--primary);color:#fff;font:inherit;font-weight:800;cursor:pointer;box-shadow:0 8px 16px #4038d82c; }
+    .submit:hover { background:var(--primary-dark); }
+    .submit:disabled { opacity:.6;cursor:wait; }
+    .message { display:none;margin:0 24px 22px;padding:13px 15px;border-radius:12px;line-height:1.45;font-size:.9rem; }
+    .message.show { display:block; }
+    .message.success { color:#12613d;background:#eaf8f0;border:1px solid #b9e7cb; }
+    .message.error { color:#8c2018;background:#fff0ef;border:1px solid #ffd0cc; }
+    .message.info { color:#343b60;background:#f0f2ff;border:1px solid #d9ddff; }
+    footer { text-align:center;color:var(--muted);font-size:.8rem;margin-top:20px;line-height:1.6; }
+    .small-link { color:var(--muted);text-decoration:underline;cursor:pointer;background:none;border:0;font:inherit;padding:0; }
+    @media(max-width:520px) { .wrap{width:min(100% - 22px,680px);padding-top:22px}.grid{grid-template-columns:1fr;gap:15px}.full{grid-column:auto}.card-head,form{padding-left:18px;padding-right:18px}.message{margin-left:18px;margin-right:18px}header{align-items:flex-start}.logo{width:48px;height:48px;border-radius:15px} }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/><path d="M9 7h7M9 11h7"/></svg>
+      </div>
+      <div>
+        <h1>LamTH Chemistry</h1>
+        <p class="subtitle">Student Attendance Portal</p>
+      </div>
+    </header>
+
+    <div class="pill"><span class="dot"></span> Student portal</div>
+
+    <section class="card" aria-labelledby="form-title">
+      <div class="card-head">
+        <h2 id="form-title">Submit your attendance</h2>
+        <p>Enter your details carefully. Your attendance will be checked against the active class session.</p>
+      </div>
+      <form id="attendance-form">
+        <div class="grid">
+          <div class="field full">
+            <label for="className">Class</label>
+            <select id="className" name="className" required>
+              <option value="">Loading available classes…</option>
+            </select>
+            <span class="hint" id="class-hint">Loading classes from the LamTH Chemistry database.</span>
+          </div>
+          <div class="field">
+            <label for="studentName">Student name</label>
+            <input id="studentName" name="studentName" autocomplete="name" required maxlength="100" placeholder="Enter your full name">
+          </div>
+          <div class="field">
+            <label for="studentId">Student ID</label>
+            <input id="studentId" name="studentId" autocomplete="off" required maxlength="50" placeholder="Enter your student ID">
+          </div>
+          <div class="field full">
+            <label for="pin">Six-digit session PIN</label>
+            <input id="pin" name="pin" inputmode="numeric" autocomplete="off" required pattern="[0-9]{6}" minlength="6" maxlength="6" placeholder="••••••" aria-describedby="pin-hint">
+            <span class="hint" id="pin-hint">Ask your tutor for the PIN for today's session.</span>
+          </div>
+          <div class="field full">
+            <label>Attendance status</label>
+            <div class="status-options">
+              <div class="status-option">
+                <input type="radio" id="present" name="status" value="present" required>
+                <label for="present">Present</label>
+              </div>
+              <div class="status-option">
+                <input type="radio" id="absent" name="status" value="absent" required>
+                <label for="absent">Absent</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="submit" id="submit-btn" type="submit">Submit Attendance</button>
+      </form>
+      <div class="message" id="message" role="status" aria-live="polite"></div>
+    </section>
+
+    <footer>
+      <div>LamTH Chemistry · Tuition Attendance</div>
+      <div>Student records are verified securely by the attendance service.</div>
+    </footer>
+  </main>
+
+  <script>
+    // Paste the deployed LamTH Chemistry Apps Script Web App URL ending in /exec.
+    const API_URL = "PASTE_YOUR_LAMTH_WEB_APP_URL_HERE";
+
+    const form = document.getElementById("attendance-form");
+    const classSelect = document.getElementById("className");
+    const classHint = document.getElementById("class-hint");
+    const submitButton = document.getElementById("submit-btn");
+    const message = document.getElementById("message");
+
+    function showMessage(text, type) {
+      message.textContent = text;
+      message.className = "message show " + type;
+    }
+
+    function setLoading(isLoading) {
+      submitButton.disabled = isLoading;
+      submitButton.textContent = isLoading ? "Submitting…" : "Submit Attendance";
+    }
+
+    async function loadClasses() {
+      if (!API_URL.startsWith("https://script.google.com/macros/s/") || !API_URL.endsWith("/exec")) {
+        classSelect.innerHTML = '<option value="">Setup required</option>';
+        classHint.textContent = "The Apps Script Web App URL has not been added yet.";
+        showMessage("The student page needs your deployed Apps Script Web App URL before it can load classes or submit attendance.", "error");
+        return;
+      }
+
+      try {
+        // JSONP avoids browser CORS restrictions for this public, class-names-only GET.
+        const data = await jsonp(API_URL + "?action=classes");
+        if (!data || data.success !== true || !Array.isArray(data.classes)) {
+          throw new Error(data && data.message ? data.message : "Could not load classes.");
+        }
+        classSelect.innerHTML = "";
+        if (data.classes.length === 0) {
+          classSelect.add(new Option("No active classes available", ""));
+          classHint.textContent = "Ask your tutor to check the Students sheet and Active column.";
+          return;
+        }
+        classSelect.add(new Option("Select your class", ""));
+        data.classes.forEach(name => classSelect.add(new Option(name, name)));
+        classHint.textContent = "Choose the class for your current tuition session.";
+        message.className = "message";
+      } catch (err) {
+        classSelect.innerHTML = '<option value="">Unable to load classes</option>';
+        classHint.textContent = "Check the Apps Script deployment and try refreshing this page.";
+        showMessage("Could not load classes. " + (err.message || "Please refresh and try again."), "error");
+      }
+    }
+
+    function jsonp(url) {
+      return new Promise((resolve, reject) => {
+        const callbackName = "lamthCallback_" + Math.random().toString(36).slice(2);
+        const script = document.createElement("script");
+        const timer = setTimeout(() => {
+          cleanup();
+          reject(new Error("The attendance service did not respond. Check that the Web App is deployed and accessible."));
+        }, 12000);
+        function cleanup() {
+          clearTimeout(timer);
+          delete window[callbackName];
+          script.remove();
+        }
+        window[callbackName] = data => {
+          cleanup();
+          resolve(data);
+        };
+        script.onerror = () => {
+          cleanup();
+          reject(new Error("Could not connect to the attendance service."));
+        };
+        const separator = url.includes("?") ? "&" : "?";
+        script.src = url + separator + "callback=" + encodeURIComponent(callbackName);
+        document.head.appendChild(script);
+      });
+    }
+
+    function submitWithFormPost(values) {
+      // A plain HTML form POST can send URL-encoded data without CORS preflight.
+      // Its response is opaque to this page; a subsequent check endpoint will be added
+      // when the backend supports request IDs. Do not claim success from the POST alone.
+      const body = new URLSearchParams(values);
+      return fetch(API_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+        body: body.toString()
+      });
+    }
+
+    form.addEventListener("submit", async event => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+
+      const values = {
+        action: "submit",
+        studentName: document.getElementById("studentName").value.trim(),
+        studentId: document.getElementById("studentId").value.trim(),
+        className: classSelect.value,
+        pin: document.getElementById("pin").value.trim(),
+        status: form.elements.status.value
+      };
+
+      if (!classSelect.value) {
+        showMessage("Please select a class.", "error");
+        return;
+      }
+
+      setLoading(true);
+      showMessage("Sending your attendance request. Please wait…", "info");
+
+      try {
+        await submitWithFormPost(values);
+        showMessage(
+          "Your request was sent, but this page cannot confirm whether it was saved. Please check with your tutor before submitting again.",
+          "info"
+        );
+      } catch (err) {
+        showMessage("Could not send your request. Please check your connection and try again.", "error");
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    loadClasses();
+  </script>
+</body>
+</html>
